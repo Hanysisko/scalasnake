@@ -116,6 +116,8 @@ const App = () => {
 
         <div className='score'>Score: {(snake.length * 10) - 10} points</div>
         <div className='score'>Speed: {Math.floor(1000/speed)} bl/s</div>
+        <div className='score'>Sprawdzam czy oba repozytoria działają :|</div>
+
 
         {gameOver && <div>GAME OVER!</div>}
         <button onClick={startGame}>Start Game</button>

@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/scalasnake/static/css/main.cd4b9ee1.css",
+    "main.js": "/scalasnake/static/js/main.d49a75cb.js",
+    "static/js/787.b3fad243.chunk.js": "/scalasnake/static/js/787.b3fad243.chunk.js",
+    "index.html": "/scalasnake/index.html",
+    "main.cd4b9ee1.css.map": "/scalasnake/static/css/main.cd4b9ee1.css.map",
+    "main.d49a75cb.js.map": "/scalasnake/static/js/main.d49a75cb.js.map",
+    "787.b3fad243.chunk.js.map": "/scalasnake/static/js/787.b3fad243.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.cd4b9ee1.css",
+    "static/js/main.d49a75cb.js"
+  ]
+}

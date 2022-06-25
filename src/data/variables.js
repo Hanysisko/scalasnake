@@ -3,8 +3,9 @@ const SNAKE_START = [
   [7, 9]
 ]; // snake start position
 const FIRST_APPLE = [12, 9]; // apple start position
-const SPEED = 250; // snake speed
-
+const SPEED = 300; // snake speed; lower = faster
+const BOMB_SPAWN_TIME = 30000; //how often new bomb should show up
+const LEVEL_MULTIPLIER = 5; //snake will go faster after X eaten apples
 const APPLE_SPEED = 10000; // changing position of apple
 const DIRECTIONS = {
   "ArrowUp": [0, -1],
@@ -18,6 +19,8 @@ export {
   SNAKE_START,
   FIRST_APPLE,
   SPEED,
+  BOMB_SPAWN_TIME,
+  LEVEL_MULTIPLIER,
   APPLE_SPEED,
   DIRECTIONS
 };

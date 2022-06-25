@@ -5,6 +5,8 @@ import {
   SNAKE_START,
   FIRST_APPLE,
   SPEED,
+  BOMB_SPAWN_TIME,
+  LEVEL_MULTIPLIER,
   APPLE_SPEED,
   DIRECTIONS
 } from "./data/variables.js";
@@ -16,6 +18,8 @@ const App = () => {
   const canvasRef = useRef();
   const [snake, setSnake] = useState(SNAKE_START);
   const [apple, setApple] = useState(FIRST_APPLE);
+  const [bomb, setBomb] = useState([]);
+  const [bombSpawnTime, setBombSpawnTime] = useState(null);
   const [dir, setDir] = useState([1, 0]);
   const [speed, setSpeed] = useState(null);
   const [appleSpeed, setAppleSpeed] = useState(null);
@@ -40,17 +44,28 @@ const App = () => {
 
   const createApple = () => apple.map((_a, i) => Math.floor(Math.random() * (CANVAS_SIZE[i])));
 
-  const checkCollision = (piece, snk = snake) => {
+  const checkCollision = (piece, snek = snake) => {
+    //collision for walls
     if (
       piece[0] >= CANVAS_SIZE[0] ||
       piece[0] < 0 ||
       piece[1] >= CANVAS_SIZE[1] ||
       piece[1] < 0
-    )
-      return true;
+    ) 
+    return true;
 
-    for (const segment of snk) {
-      if (piece[0] === segment[0] && piece[1] === segment[1]) return true;
+    //collision for mines
+    for (const segment of bomb) {
+      if (
+        piece[0] === segment[0] && piece[1] === segment[1]
+      ) return true;
+    }
+
+    //collison for snek tummy
+    for (const segment of snek) {
+      if (
+        piece[0] === segment[0] && piece[1] === segment[1]
+      ) return true;
     }
     return false;
   };
@@ -61,8 +76,8 @@ const App = () => {
       while (checkCollision(newApple, newSnake)) {
         newApple = createApple();
       }
-      if (snake.length % 3 === 0) {
-        setSpeed(speed - 0.2*speed)
+      if (snake.length % LEVEL_MULTIPLIER === 0) {
+        setSpeed(Math.floor(speed - 0.2*speed))
       }
       setApple(newApple);
       return true;
@@ -71,7 +86,7 @@ const App = () => {
   };
 
   const gameLoop = () => {
-    const snakeCopy = JSON.parse(JSON.stringify(snake));
+    const snakeCopy = JSON.parse(JSON.stringify(snake)); //deep copy of snake
     const newSnakeHead = [snakeCopy[0][0] + dir[0], snakeCopy[0][1] + dir[1]];
     snakeCopy.unshift(newSnakeHead);
     if (checkCollision(newSnakeHead)) endGame();
@@ -82,6 +97,7 @@ const App = () => {
   const startGame = () => {
     setSpeed(SPEED);
     setAppleSpeed(APPLE_SPEED);
+    setBombSpawnTime(BOMB_SPAWN_TIME);
 
     setSnake(SNAKE_START);
     setApple(FIRST_APPLE);
@@ -89,36 +105,45 @@ const App = () => {
     setGameOver(false);
   };
 
-  useEffect(() => {
+  useEffect(() => { // gameboard for the game
     const context = canvasRef.current.getContext("2d");
-    context.setTransform(1, 0, 0, 1, 0, 0);
     context.clearRect(0, 0, window.innerWidth, window.innerHeight);
-    context.fillStyle = "brown";
+    context.fillStyle = "sienna";
     snake.forEach(([x, y]) => context.fillRect(x, y, 1, 1));
-    context.fillStyle = "black";
+    context.fillStyle = "saddlebrown";
     context.fillRect(snake[0][0], snake[0][1], 1, 1);
     context.fillStyle = "red";
     context.fillRect(apple[0], apple[1], 1, 1);
+    context.fillStyle = "black";
+    bomb.forEach(([x, y]) => context.fillRect(x, y, 1, 1));
+
   }, [snake, apple, gameOver]);
 
   useInterval(() => gameLoop(), speed);
   useInterval(() => setApple(createApple()), appleSpeed);
-  // useInterval(() => , 10000);
+  
+  //adding new bombs to the game
+  useInterval(() => setBomb(
+    arr => [...arr, 
+      [
+        Math.floor(Math.random()* (CANVAS_SIZE[0])),
+        Math.floor(Math.random()* (CANVAS_SIZE[1]))
+      ]
+    ]),
+    bombSpawnTime);
 
   return (
     <div className='app' onKeyDown={e => moveSnake(e)}>
       <div className='container'>
+        <h1>ScalaSnake</h1>
+        <h2>Score: {(snake.length * 10) - 10} points</h2>
+        
         <canvas
           ref={canvasRef}
           width={`${CANVAS_SIZE[0]}px`}
           height={`${CANVAS_SIZE[1]}px`}
         />
-
-        <div className='score'>Score: {(snake.length * 10) - 10} points</div>
-        <div className='score'>Speed: {Math.floor(1000/speed)} bl/s</div>
-        <div className='score'>Sprawdzam czy oba repozytoria działają :|</div>
-
-
+        
         {gameOver && <div>GAME OVER!</div>}
         <button onClick={startGame}>Start Game</button>
       </div>

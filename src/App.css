@@ -1,6 +1,9 @@
 .app {
-  text-align: center;
-  align-items: center;
+  height: 100vh;
+  background-color: #acd9a6;
+  color: white;
+  text-shadow: 0 0 6px black;
+
 }
 
 .container {
@@ -9,19 +12,21 @@
   align-items: center;
 }
 
+h2{
+  margin: 20px 0 0 0 ;
+}
+
 canvas {
   background-image: url('../public/gameboard.png');
-  image-rendering: optimizeSpeed;             /* STOP SMOOTHING, GIVE ME SPEED  */
   image-rendering: -moz-crisp-edges;          /* Firefox                        */
   image-rendering: -o-crisp-edges;            /* Opera                          */
   image-rendering: -webkit-optimize-contrast; /* Chrome (and eventually Safari) */
   image-rendering: pixelated; /* Chrome */
   background-size: cover;
-
   border: 2px solid black;
   min-width: 400px;
-  max-width: 600px;
-  margin: 5% 5%;
+  margin: 15px 15px;
+  box-shadow: 0 0 15px black;
 }
 
 .score{
@@ -29,5 +34,19 @@ canvas {
 }
 
 button{
-  margin: 5px 0px;
+  font-family: 'Open Sans Condensed', sans-serif;
+  font-weight: 700;
+  text-shadow: 0 0 6px black;
+  white-space: nowrap;
+  display: inline-block;
+  border-radius: 5px;
+  padding: 15px 32px;
+  font-size: 20px;
+  color: white;
+  background-color: #96f589;
+  box-shadow: 0 0 7px black;
+}
+button:hover {
+  cursor: pointer;
+  background-color: #8eff80;
 }

@@ -1,4 +1,5 @@
 ScalaSnake in React with Hooks and canvas
+live deployment: https://hanysisko.github.io/scalasnake/
 
 functionalities to add:
 - ✓ adding mines 

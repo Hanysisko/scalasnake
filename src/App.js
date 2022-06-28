@@ -22,7 +22,7 @@ const App = () => {
   const [snake, setSnake] = useState(SNAKE_START);
   const [apple, setApple] = useState(FIRST_APPLE);
   const [bomb, setBomb] = useState([]);
-  const [bombSpawnTime, setBombSpawnTime] = useState(null);
+  const [bombSpawnTime, setBombSpawnTime] = useState(null); 
   const [dir, setDir] = useState([1, 0]);
   const [speed, setSpeed] = useState(null);
   const [appleSpeed, setAppleSpeed] = useState(null);
@@ -63,7 +63,6 @@ const App = () => {
 
   //changing snake direction
   const moveSnake = ({ key }) => {
-    console.log('hmm');
     //use only arrows, ignore any other keyboard output
     if(
       key === "ArrowDown" || 
@@ -81,7 +80,7 @@ const App = () => {
       }
   }
 
-  //generating new entity (apple or bombs) coordinates in empty places
+  //generating new entity (apple or bomb) in empty place on canvas
   const generateOnEmptyField = () => {
     let entityGenerator = () => (
       apple.map((_, i) => Math.floor(Math.random() * (CANVAS_SIZE[i])))
@@ -178,7 +177,7 @@ const App = () => {
     return () => window.removeEventListener('keydown', moveSnake);
   }, [moveSnake]);
 
-  //game interval is 'speed', which we change in proper functions, like startGame, resetGame etc.
+  //game interval is 'speed', which we change in proper functions, f.e. startGame, resetGame
   useInterval(() => gameLoop(), speed);
 
   //adding new bombs to the game every 'bombSpawnTime' ms
@@ -205,7 +204,6 @@ const App = () => {
           <span style={{color: GAME_COLORS.bombs}}> bombs </span>
           !
         </p>
-
 
         {startButton &&
           <h2>Good luck!</h2>

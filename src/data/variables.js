@@ -2,15 +2,15 @@ const GAME_COLORS = {
   snakeBody: "sienna",
   snakeHead: "saddlebrown",
   apple: "red",
-  mines: "black"
+  bombs: "black"
 }
-const CANVAS_SIZE = [20, 20]; // background is 20x20 image, it will not scale with changing CANVAS_SIZE!
+const CANVAS_SIZE = [20, 20]; //NOTE: background is 20x20 image, it will not scale with changing CANVAS_SIZE!
 const SNAKE_START = [
   [7, 9]
 ]; // snake start position
 const FIRST_APPLE = [12, 9]; // apple start position
 const SPEED = 300; // snake speed; lower = faster
-const BOMB_SPAWN_TIME = 10000; //how often new bomb should show up
+const BOMB_SPAWN_TIME = 30000; //how often new bomb should show up
 const LEVEL_MULTIPLIER = 5; //snake will go faster after X eaten apples
 const APPLE_SPEED = 10000; // changing position of apple
 const DIRECTIONS = {

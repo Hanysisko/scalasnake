@@ -9,7 +9,7 @@ const SNAKE_START = [
   [7, 9]
 ]; // snake start position
 const FIRST_APPLE = [12, 9]; // apple start position
-const SPEED = 300; // snake speed; lower = faster
+const SPEED = 3; // snake speed; lower = faster
 const BOMB_SPAWN_TIME = 30000; //how often new bomb should show up
 const LEVEL_MULTIPLIER = 5; //snake will go faster after X eaten apples
 const APPLE_SPEED = 10000; // changing position of apple

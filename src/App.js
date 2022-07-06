@@ -13,14 +13,14 @@ import {
 
 import Modal from "./components/modal/modal.component.jsx";
 import CustomButton from "./components/custom-button/custom-button.component.jsx";
-
-import './App.css';
 import Header from "./components/header/header.component.jsx";
 import Gameboard from "./components/gameboard/gameboard.component.jsx";
 
+import './App.css';
 
 const App = () => {
-  const scoreCounter = useRef(0);
+  const requestRef = useRef();
+  const previousTimeRef = useRef();
 
   const [snake, setSnake] = useState(SNAKE_START);
   const [apple, setApple] = useState(FIRST_APPLE);
@@ -28,10 +28,11 @@ const App = () => {
   const [gameOver, setGameOver] = useState(false);
   const [showStartButton, setShowStartButton] = useState(true);
 
-  const [bombSpawnTime, setBombSpawnTime] = useState(null); 
+  const scoreCounter = useRef(0);
   const [dir, setDir] = useState([1, 0]);
-  const lastDir = useRef([0,0]);
+  const lastDir = useRef([1, 0]);
   const [speed, setSpeed] = useState(null);
+  const [bombSpawnTime, setBombSpawnTime] = useState(null); 
   const [appleSpeed, setAppleSpeed] = useState(null);
 
 
@@ -60,7 +61,6 @@ const App = () => {
     setApple(FIRST_APPLE);
     setDir([1, 0]);
     setBomb([]);
-    scoreCounter.current = 0;
     setGameOver(false);
     setShowStartButton(true);
   };
@@ -84,12 +84,12 @@ const App = () => {
         if (lastDir.current[0] !== 0) break
         setDir(DIRECTIONS[key])
         break
+      default: break
     }
   }
 
   //generating new entity (apple or bomb) in empty place on canvas
   const generateOnEmptyField = () => {
-    
     let entityGenerator = () => {
       let randomEntity = 
       [
@@ -98,10 +98,9 @@ const App = () => {
       ]
       return randomEntity;
     };
+    
     let newEntity = entityGenerator();
-
-    // do not spawn entity on snake or bombs
-    while (checkCollision(newEntity)) {
+    while (checkDeadlyEntitiesCollision(newEntity)) {
       newEntity = entityGenerator();
     }
     return newEntity;
@@ -119,7 +118,7 @@ const App = () => {
   }
 
   //checking collision for all hostile objects (snake and bombs)
-  const checkCollision = (piece) => {
+  const checkDeadlyEntitiesCollision = (piece) => {
     let deadlyEntities = snake.concat(bomb)
     for (const segment of deadlyEntities) {
       if (
@@ -132,15 +131,14 @@ const App = () => {
   //checking collision for snakeHead and apple, and generating new apple in empty field
   const checkAppleCollision = newSnake => {
      if (newSnake[0][0] === apple[0] && newSnake[0][1] === apple[1]) {
-      
       let newApple = generateOnEmptyField();
+      
       //adding speed when snake surpasses LEVEL_MULTIPLIER
-      if (snake.length % LEVEL_MULTIPLIER === 0) {
-        setSpeed(Math.floor(0.8*speed))
+      if (snake.length % LEVEL_MULTIPLIER === 0){
+        setSpeed(1.25*speed);
       }
       //updating score
       scoreCounter.current = scoreCounter.current + 10;
-      
       setApple(newApple);      
       return true;
     }
@@ -148,24 +146,34 @@ const App = () => {
   };
 
   //one 'tick' in the game
-  const gameLoop = () => {
+  const gameLoop = time => {
+    if (speed === null) return
+    requestRef.current = requestAnimationFrame(gameLoop);
+    const secondsSinceLastRender = (time - previousTimeRef.current) / 1000;
+    if (secondsSinceLastRender < 1 / speed) return
+    
     lastDir.current = dir;
     const snakeCopy = JSON.parse(JSON.stringify(snake)); //deep copy of snake
     const newSnakeHead = [snakeCopy[0][0] + dir[0], snakeCopy[0][1] + dir[1]];
     snakeCopy.unshift(newSnakeHead);
-    if (checkCollision(newSnakeHead) || checkWallCollision(newSnakeHead)) endGame();
+    if (checkDeadlyEntitiesCollision(newSnakeHead) || checkWallCollision(newSnakeHead)) endGame();
     if (!checkAppleCollision(snakeCopy)) snakeCopy.pop();
+    
     setSnake(snakeCopy);
+    previousTimeRef.current = time;
   };
 
   //event listener
   useEffect(() => {
     window.addEventListener('keydown', moveSnake);
     return () => window.removeEventListener('keydown', moveSnake);
-  }, [moveSnake]);
+  }, []);
 
-  //game interval is 'speed', which we change in proper functions, f.e. startGame, resetGame
-  useInterval(() => gameLoop(), speed);
+  //requestAnimationFrame
+  useEffect(() => {
+    requestRef.current = requestAnimationFrame(gameLoop);
+    return () => cancelAnimationFrame(requestRef.current);
+  }, [gameLoop]);
 
   //adding new bombs to the game every 'bombSpawnTime' ms
   useInterval(() => {    
@@ -183,6 +191,13 @@ const App = () => {
   return (
     <div className='app'>
       <div className='container'>
+
+        {gameOver && 
+          <Modal 
+            points={scoreCounter.current}
+            resetGame={resetGame}
+          />
+        }
         
         <Header
           showStartButton={showStartButton}
@@ -194,13 +209,6 @@ const App = () => {
           apple={apple}
           bomb={bomb}
         />
-        
-        {gameOver && 
-          <Modal 
-            points={scoreCounter.current}
-            resetGame={resetGame}
-          />
-        }
 
         {showStartButton &&
           <CustomButton 
@@ -213,7 +221,6 @@ const App = () => {
 
       </div>
     </div>
-
   );
 };
 

@@ -19,22 +19,24 @@ import './App.css';
 const App = () => {
   const canvasRef = useRef();
   const scoreCounter = useRef(0);
+
   const [snake, setSnake] = useState(SNAKE_START);
   const [apple, setApple] = useState(FIRST_APPLE);
   const [bomb, setBomb] = useState([]);
-  const [bombSpawnTime, setBombSpawnTime] = useState(null); 
-  const [dir, setDir] = useState([1, 0]);
-  const [speed, setSpeed] = useState(null);
-  const [appleSpeed, setAppleSpeed] = useState(null);
   const [gameOver, setGameOver] = useState(false);
   const [startButton, setStartButton] = useState(true);
+
+  const [bombSpawnTime, setBombSpawnTime] = useState(null); 
+  const [dir, setDir] = useState([1, 0]);
+  const lastDir = useRef([0,0]);
+  const [speed, setSpeed] = useState(null);
+  const [appleSpeed, setAppleSpeed] = useState(null);
 
 
   const startGame = () => {
     setSpeed(SPEED);
     setAppleSpeed(APPLE_SPEED);
     setBombSpawnTime(BOMB_SPAWN_TIME);
-
     setSnake(SNAKE_START);
     setApple(FIRST_APPLE);
     setDir([1, 0]);
@@ -63,65 +65,61 @@ const App = () => {
 
   //changing snake direction
   const moveSnake = ({ key }) => {
-    //use only arrows, ignore any other keyboard output
-    if(
-      key === "ArrowDown" || 
-      key === "ArrowLeft" || 
-      key === "ArrowRight" || 
-      key === "ArrowUp"
-      ){
-        //you cannot change it into opposite direction
-        if(
-          (key === "ArrowUp" && dir[0] === 0 && dir[1] === 1) ||
-          (key === "ArrowDown" && dir[0] === 0 && dir[1] === -1) ||
-          (key === "ArrowLeft" && dir[0] === 1 && dir[1] === 0) ||
-          (key === "ArrowRight" && dir[0] === -1 && dir[1] === 0)
-        ){return}else{setDir(DIRECTIONS[key]);}
-      }
+    switch (key) {
+      case 'ArrowUp':
+        if (lastDir.current[1] !== 0) break
+        setDir(DIRECTIONS[key])
+        break
+      case 'ArrowDown':
+        if (lastDir.current[1] !== 0) break
+        setDir(DIRECTIONS[key])
+        break
+      case 'ArrowLeft':
+        if (lastDir.current[0] !== 0) break
+        setDir(DIRECTIONS[key])
+        break
+      case 'ArrowRight':
+        if (lastDir.current[0] !== 0) break
+        setDir(DIRECTIONS[key])
+        break
+    }
   }
 
   //generating new entity (apple or bomb) in empty place on canvas
   const generateOnEmptyField = () => {
-    let entityGenerator = () => (
-      apple.map((_, i) => Math.floor(Math.random() * (CANVAS_SIZE[i])))
-    );
-
+    
+    let entityGenerator = () => {
+      let randomEntity = 
+      [
+        Math.floor(Math.random() * (CANVAS_SIZE[0])),
+        Math.floor(Math.random() * (CANVAS_SIZE[1]))
+      ]
+      return randomEntity;
+    };
     let newEntity = entityGenerator();
-    // do not spawn entity on snake
-    while (checkCollision(newEntity, snake)) {
-      newEntity = entityGenerator();
-    }
-    //do not spawn apple on bombs
-    while (checkCollision(newEntity, bomb)) {
-      newEntity = entityGenerator();
-    }
-    //do not spawn entity on apple
-    while (checkCollision(newEntity, apple)) {
+
+    // do not spawn entity on snake or bombs
+    while (checkCollision(newEntity)) {
       newEntity = entityGenerator();
     }
     return newEntity;
   }
 
-  //checking collision for all objects
-  const checkCollision = (piece, snek = snake) => {
-    //collision for walls
+  //collision for walls
+  const checkWallCollision = (piece) => {
     if (
       piece[0] >= CANVAS_SIZE[0] ||
       piece[0] < 0 ||
       piece[1] >= CANVAS_SIZE[1] ||
       piece[1] < 0
-    ) 
-    return true;
+    ) return true;
+    return false;
+  }
 
-    //collision for bombs
-    for (const segment of bomb) {
-      if (
-        piece[0] === segment[0] && piece[1] === segment[1]
-      ) return true;
-    }
-
-    //collison for snek tummy
-    for (const segment of snek) {
+  //checking collision for all hostile objects (snake and bombs)
+  const checkCollision = (piece) => {
+    let deadlyEntities = snake.concat(bomb)
+    for (const segment of deadlyEntities) {
       if (
         piece[0] === segment[0] && piece[1] === segment[1]
       ) return true;
@@ -136,7 +134,7 @@ const App = () => {
       let newApple = generateOnEmptyField();
       //adding speed when snake surpasses LEVEL_MULTIPLIER
       if (snake.length % LEVEL_MULTIPLIER === 0) {
-        setSpeed(Math.floor(speed - 0.2*speed))
+        setSpeed(Math.floor(0.8*speed))
       }
       //updating score
       scoreCounter.current = scoreCounter.current + 10;
@@ -149,16 +147,16 @@ const App = () => {
 
   //one 'tick' in the game
   const gameLoop = () => {
+    lastDir.current = dir;
     const snakeCopy = JSON.parse(JSON.stringify(snake)); //deep copy of snake
     const newSnakeHead = [snakeCopy[0][0] + dir[0], snakeCopy[0][1] + dir[1]];
     snakeCopy.unshift(newSnakeHead);
-    if (checkCollision(newSnakeHead)) endGame();
+    if (checkCollision(newSnakeHead) || checkWallCollision(newSnakeHead)) endGame();
     if (!checkAppleCollision(snakeCopy)) snakeCopy.pop();
     setSnake(snakeCopy);
   };
 
-  // generating canvas (gameboard) for the game
-  useEffect(() => { 
+  const draw = () => {
     const context = canvasRef.current.getContext("2d");
     context.clearRect(0, 0, window.innerWidth, window.innerHeight);
     context.fillStyle = GAME_COLORS.snakeBody;
@@ -169,7 +167,10 @@ const App = () => {
     context.fillRect(apple[0], apple[1], 1, 1);
     context.fillStyle = GAME_COLORS.bombs;
     bomb.forEach(([x, y]) => context.fillRect(x, y, 1, 1));
-  }, [snake, apple, gameOver]);
+  };
+
+  // generating canvas (gameboard) for the game
+  useEffect(() => draw(), [snake, apple, bomb]);
 
   //event listener
   useEffect(() => {

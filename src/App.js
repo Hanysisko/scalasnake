@@ -1,7 +1,6 @@
-import React, {  useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useInterval } from "./hooks/useInterval.js";
 import {
-  GAME_COLORS,
   CANVAS_SIZE,
   SNAKE_START,
   FIRST_APPLE,
@@ -12,19 +11,22 @@ import {
   DIRECTIONS
 } from "./data/variables.js";
 
-import Modal from "./components/Modal.js";
+import Modal from "./components/modal/modal.component.jsx";
+import CustomButton from "./components/custom-button/custom-button.component.jsx";
+
 import './App.css';
+import Header from "./components/header/header.component.jsx";
+import Gameboard from "./components/gameboard/gameboard.component.jsx";
 
 
 const App = () => {
-  const canvasRef = useRef();
   const scoreCounter = useRef(0);
 
   const [snake, setSnake] = useState(SNAKE_START);
   const [apple, setApple] = useState(FIRST_APPLE);
   const [bomb, setBomb] = useState([]);
   const [gameOver, setGameOver] = useState(false);
-  const [startButton, setStartButton] = useState(true);
+  const [showStartButton, setShowStartButton] = useState(true);
 
   const [bombSpawnTime, setBombSpawnTime] = useState(null); 
   const [dir, setDir] = useState([1, 0]);
@@ -43,7 +45,7 @@ const App = () => {
     setBomb([]);
     scoreCounter.current = 0;
     setGameOver(false);
-    setStartButton(false);
+    setShowStartButton(false);
   };
 
   const endGame = () => {
@@ -60,7 +62,7 @@ const App = () => {
     setBomb([]);
     scoreCounter.current = 0;
     setGameOver(false);
-    setStartButton(true);
+    setShowStartButton(true);
   };
 
   //changing snake direction
@@ -156,22 +158,6 @@ const App = () => {
     setSnake(snakeCopy);
   };
 
-  const draw = () => {
-    const context = canvasRef.current.getContext("2d");
-    context.clearRect(0, 0, window.innerWidth, window.innerHeight);
-    context.fillStyle = GAME_COLORS.snakeBody;
-    snake.forEach(([x, y]) => context.fillRect(x, y, 1, 1));
-    context.fillStyle = GAME_COLORS.snakeHead;
-    context.fillRect(snake[0][0], snake[0][1], 1, 1);
-    context.fillStyle = GAME_COLORS.apple;
-    context.fillRect(apple[0], apple[1], 1, 1);
-    context.fillStyle = GAME_COLORS.bombs;
-    bomb.forEach(([x, y]) => context.fillRect(x, y, 1, 1));
-  };
-
-  // generating canvas (gameboard) for the game
-  useEffect(() => draw(), [snake, apple, bomb]);
-
   //event listener
   useEffect(() => {
     window.addEventListener('keydown', moveSnake);
@@ -197,36 +183,32 @@ const App = () => {
   return (
     <div className='app'>
       <div className='container'>
-        <h1>ScalaSnake</h1>
-        <p>You are a <span style={{color: GAME_COLORS.snakeHead}}>Snake</span>!</p>
-        <p>Try to eat as many 
-          <span style={{color: GAME_COLORS.apple}}> apples </span> 
-          as possible but try to avoid  
-          <span style={{color: GAME_COLORS.bombs}}> bombs </span>
-          !
-        </p>
-
-        {startButton &&
-          <h2>Good luck!</h2>
-        }
-        {!startButton &&
-          <h2 style={{color:"black"}}>Score: <span style={{color:"white"}}>{scoreCounter.current}</span> points</h2>
-        }
         
-        <canvas
-          ref={canvasRef}
-          width={`${CANVAS_SIZE[0]}px`}
-          height={`${CANVAS_SIZE[1]}px`}
+        <Header
+          showStartButton={showStartButton}
+          points={scoreCounter.current}
+        />
+        
+        <Gameboard
+          snake={snake}
+          apple={apple}
+          bomb={bomb}
         />
         
         {gameOver && 
-        <Modal 
-          points={scoreCounter.current}
-          resetGame={resetGame}
-        />}
+          <Modal 
+            points={scoreCounter.current}
+            resetGame={resetGame}
+          />
+        }
 
-        {startButton &&
-          <button onClick={startGame}>Start Game</button>
+        {showStartButton &&
+          <CustomButton 
+            mainPage
+            onClick={startGame}
+          >
+            Start game
+          </CustomButton>
         }
 
       </div>

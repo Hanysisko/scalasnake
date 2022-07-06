@@ -1,0 +1,32 @@
+.custom-button{
+  font-family: 'Open Sans Condensed', sans-serif;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 0 6px black;
+  white-space: nowrap;
+  display: inline-block;
+  border-radius: 5px;
+  padding: 15px 32px;
+  font-size: 20px;
+  box-shadow: 0 0 7px black;
+
+  &.main-page-button{
+    background-color: #96f589;
+
+    &:hover {
+      cursor: pointer;
+      background-color: #8eff80;
+    }
+  }
+
+  &.modal-button{
+    margin: 10px;
+    background: #ccc;
+
+    &:hover{
+      cursor: pointer;
+      background: #bbb;
+    }
+  }
+}
+

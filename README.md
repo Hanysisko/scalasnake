@@ -20,9 +20,16 @@ problems solved
   f.e. when going up, it should ignore ArrowDown, not to collapse on itself (SOLUTION: modified moveSnake() )
 - ✓ comments next to functions
 - ✓ there's small chance that bomb can generate on apple, meybe even in snake etc. - I need to check on that later (SOLUTION: generateOnEmptyField() )
-- ✓ snake can still collapse on itself if you click two directions fast enough. Probable solution: increase game fps but it will be time consuming (Solution: Using dir and lastDir to to store 'history' of movement)
+- ✓ snake can still collapse on itself if you click two directions fast enough. Probable solution: increase game fps but it will be time consuming (SOLUTION: Using dir and lastDir to store 'history' of movement)
+
+PROBLEMS
+- TYPESCRIPT
+  - only App.tsx, other files are in js/jsx
+  - I cannot change file names from js/jsx to ts/tsx, because 'import' doesn't work
+- when I'm going to another tab, snake freezes (requestAnimationFrame()), but generation of bombs (setInterval every 30sec) and changing apple position (setInterval every 10sec) don't
 
 IDEAS 
+- coding with typescript?
 - Moving game logic to one file, maybe as a hook 'useSnake'? or few hooks for snake food, bombs?
 - Difficulty levels? Maybe options as modal to change parameters?
 

@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { useInterval } from "./hooks/useInterval.js";
+import { useInterval } from './hooks/useInterval'
 import {
   CANVAS_SIZE,
   SNAKE_START,
@@ -9,31 +9,31 @@ import {
   LEVEL_MULTIPLIER,
   APPLE_SPEED,
   DIRECTIONS
-} from "./data/variables.js";
+} from "./data/variables";
 
-import Modal from "./components/modal/modal.component.jsx";
-import CustomButton from "./components/custom-button/custom-button.component.jsx";
-import Header from "./components/header/header.component.jsx";
-import Gameboard from "./components/gameboard/gameboard.component.jsx";
+import Modal from "./components/modal/modal.component";
+import CustomButton from "./components/custom-button/custom-button.component";
+import Header from "./components/header/header.component";
+import Gameboard from "./components/gameboard/gameboard.component";
 
 import './App.css';
 
 const App = () => {
-  const requestRef = useRef();
-  const previousTimeRef = useRef();
+  const requestRef = useRef<number>(0);
+  const previousTimeRef = useRef<number>(0);
 
-  const [snake, setSnake] = useState(SNAKE_START);
-  const [apple, setApple] = useState(FIRST_APPLE);
-  const [bomb, setBomb] = useState([]);
-  const [gameOver, setGameOver] = useState(false);
-  const [showStartButton, setShowStartButton] = useState(true);
+  const [snake, setSnake] = useState<number[][]>(SNAKE_START);
+  const [apple, setApple] = useState<number[]>(FIRST_APPLE);
+  const [bomb, setBomb] = useState<number[][]>([]);
+  const [gameOver, setGameOver] = useState<boolean>(false);
+  const [showStartButton, setShowStartButton] = useState<boolean>(true);
 
-  const scoreCounter = useRef(0);
-  const [dir, setDir] = useState([1, 0]);
-  const lastDir = useRef([1, 0]);
-  const [speed, setSpeed] = useState(null);
-  const [bombSpawnTime, setBombSpawnTime] = useState(null); 
-  const [appleSpeed, setAppleSpeed] = useState(null);
+  const scoreCounter = useRef<number>(0);
+  const [dir, setDir] = useState<number[]>([1, 0]);
+  const lastDir = useRef<number[]>([1, 0]);
+  const [speed, setSpeed] = useState<number>(0);
+  const [bombSpawnTime, setBombSpawnTime] = useState<null | number>(null); 
+  const [appleSpeed, setAppleSpeed] = useState<null | number>(null);
 
 
   const startGame = () => {
@@ -50,7 +50,7 @@ const App = () => {
   };
 
   const endGame = () => {
-    setSpeed(null);
+    setSpeed(0);
     setAppleSpeed(null);
     setBombSpawnTime(null);
     setGameOver(true);
@@ -91,7 +91,7 @@ const App = () => {
   //generating new entity (apple or bomb) in empty place on canvas
   const generateOnEmptyField = () => {
     let entityGenerator = () => {
-      let randomEntity = 
+      let randomEntity:number[] = 
       [
         Math.floor(Math.random() * (CANVAS_SIZE[0])),
         Math.floor(Math.random() * (CANVAS_SIZE[1]))
@@ -107,7 +107,7 @@ const App = () => {
   }
 
   //collision for walls
-  const checkWallCollision = (piece) => {
+  const checkWallCollision = (piece: number[]) => {
     if (
       piece[0] >= CANVAS_SIZE[0] ||
       piece[0] < 0 ||
@@ -118,8 +118,8 @@ const App = () => {
   }
 
   //checking collision for all hostile objects (snake and bombs)
-  const checkDeadlyEntitiesCollision = (piece) => {
-    let deadlyEntities = snake.concat(bomb)
+  const checkDeadlyEntitiesCollision = (piece: number[]) => {
+    let deadlyEntities:number[][] = snake.concat(bomb)
     for (const segment of deadlyEntities) {
       if (
         piece[0] === segment[0] && piece[1] === segment[1]
@@ -129,7 +129,7 @@ const App = () => {
   };
 
   //checking collision for snakeHead and apple, and generating new apple in empty field
-  const checkAppleCollision = newSnake => {
+  const checkAppleCollision = (newSnake: number[][]) => {
      if (newSnake[0][0] === apple[0] && newSnake[0][1] === apple[1]) {
       let newApple = generateOnEmptyField();
       
@@ -146,7 +146,7 @@ const App = () => {
   };
 
   //one 'tick' in the game
-  const gameLoop = time => {
+  const gameLoop = (time: number) => {
     if (speed === null) return
     requestRef.current = requestAnimationFrame(gameLoop);
     const secondsSinceLastRender = (time - previousTimeRef.current) / 1000;
@@ -172,6 +172,7 @@ const App = () => {
   //requestAnimationFrame
   useEffect(() => {
     requestRef.current = requestAnimationFrame(gameLoop);
+    console.log(requestRef.current);
     return () => cancelAnimationFrame(requestRef.current);
   }, [gameLoop]);
 
@@ -212,8 +213,9 @@ const App = () => {
 
         {showStartButton &&
           <CustomButton 
-            mainPage
-            onClick={startGame}
+            mainPage={true}
+            onClick={startGame} 
+            modal={false}          
           >
             Start game
           </CustomButton>

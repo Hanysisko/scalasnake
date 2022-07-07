@@ -172,7 +172,6 @@ const App = () => {
   //requestAnimationFrame
   useEffect(() => {
     requestRef.current = requestAnimationFrame(gameLoop);
-    console.log(requestRef.current);
     return () => cancelAnimationFrame(requestRef.current);
   }, [gameLoop]);
 
